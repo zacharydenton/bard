@@ -8,6 +8,15 @@ import cPickle as pickle
 
 def detokenize(tokens):
     ''' humble attempt at converting a list of tokens into text '''
+    # we make a copy of the tokens, to remove any duplicate punctuation
+    copy = tokens[:]
+    for i, token in enumerate(copy):
+        try:
+            if copy[i] == copy[i+1] and token in "!.?":
+                tokens[i] = ''
+        except:
+            pass
+
     output = ''
     for i, token in enumerate(tokens):
         output += token
@@ -16,7 +25,7 @@ def detokenize(tokens):
         except IndexError:
             next_word = ''
 
-        if next_word in '.!?,\'\')";' or token in '(``':
+        if next_word in '.!?,\'\')";:' or token in '(``':
             output += ''
         else:
             output += ' '
@@ -53,7 +62,7 @@ class Markov:
                 else:
                     cache[key] = [w3]
             if use_cache:
-                cachefile = open('.markov_cache', 'wb')
+                cachefile = open('.trigram_cache', 'wb')
                 pickle.dump(cache, cachefile, -1)
                 cachefile.close()
         return cache
@@ -109,7 +118,7 @@ class Markov:
                         w1, w2 = self.get_next(w1, w2, None, exclude=exclude)
                     except Exception as e:
                         w1, w2 = self.get_next(w1, w2, None)
-                        print >> sys.stderr, "forced to append something which I wanted to exclude:", w2
+                        #print >> sys.stderr, "forced to append something which I wanted to exclude:", w2
                 except Exception as e:
                     print >> sys.stderr, e
                     return detokenize(results) + "."
@@ -204,5 +213,5 @@ class Markov:
         return False
 
 if __name__ == "__main__":
-    markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction')), use_cache=False)
+    markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction', 'romance', 'adventure')), use_cache=True)
     print markov.pseudorandom_text(length=200000)
