@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # generate random text using trigrams and markov chains
-# this uses part-of-speech tagged data from the Brown corpus
+# supports plain text and part-of-speech tagged text.
 import sys
 import random
 import nltk
@@ -51,9 +51,7 @@ class Markov:
         self.tagged = self.istagged()
 
     def generate_cache(self, trigrams, use_cache):
-        # generate a dict 
-        # where keys are (v1, v2) and value is list of 
-        # possible v3's 
+        ''' generate a dict from a list of trigrams where keys are (v1, v2) and value is list of possible v3's '''
         try:
             if use_cache:
                 print >> sys.stderr, "loading trigram cache..."
@@ -223,5 +221,9 @@ class Markov:
         return False
 
 if __name__ == "__main__":
+    try:
+        limit = int(sys.argv[1])
+    except IndexError:
+        limit = 100
     markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction')), use_cache=False)
-    print markov.pseudorandom_text(length=1000)
+    print markov.pseudorandom_text(length=limit)

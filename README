@@ -1,0 +1,53 @@
+Help on module pseudorandom:
+
+NAME
+    pseudorandom
+
+FILE
+    /home/zdenton/bin/py/pseudorandom/pseudorandom.py
+
+DESCRIPTION
+    # generate random text using trigrams and markov chains
+    # supports plain text and part-of-speech tagged text.
+
+CLASSES
+    Markov
+    
+    class Markov
+     |  Methods defined here:
+     |  
+     |  __init__(self, tokens, use_cache=False)
+     |  
+     |  generate_cache(self, trigrams, use_cache)
+     |      generate a dict from a list of trigrams where keys are (v1, v2) and value is list of possible v3's
+     |  
+     |  get_largest(self)
+     |      return the key of the item in the cache with the most possibilities
+     |  
+     |  get_next(self, w1, w2, search_for, exclude=[])
+     |      find a trigram of the form (w1, w2, search_for)
+     |  
+     |  get_starter(self)
+     |      return the key of the item in the cache which is best suited for starting the text.
+     |  
+     |  get_tags(self)
+     |      return the different part-of-speech tags in the cache
+     |  
+     |  istagged(self)
+     |      determine whether our tokens are part-of-speech tagged or not
+     |  
+     |  markov_text(self, w1=None, w2=None, length=100)
+     |      a pure version of the pseudorandom Markov chain text generator
+     |  
+     |  pseudorandom_text(self, w1=None, w2=None, length=100)
+     |      uses a Markov chain to produce pseudorandom text.
+     |      
+     |      Contains some rules to ensure that the resultant text is logical;
+     |      however this may result in infinite loops if the source text is not 
+     |      large enough.
+
+FUNCTIONS
+    detokenize(tokens)
+        humble attempt at converting a list of tokens into text
+
+
