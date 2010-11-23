@@ -65,18 +65,50 @@ class Markov:
             w1, w2 = self.get_starter()
 
         results = []
+        search_for = None
         for i in range(length):
             if self.tagged:
+                current_tag = w1[1]
                 results.append(w1[0])
             else:
+                current_tag = w1
                 results.append(w1)
-            w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+
+            if current_tag == '(':
+                search_for = ')'
+            elif current_tag == "``":
+                search_for = "''"
+
+            if search_for:
+                search_results = self.search_for(w1, w2, search_for)
+                if search_results:
+                    w1, w2 = w2, random.choice(search_results)
+                    search_for = None
+                else:
+                    w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+            else:
+                w1, w2 = w2, random.choice(self.cache[(w1, w2)])
         if self.tagged:
             results.append(w2[0])
         else:
             results.append(w2)
 
         return detokenize(results)
+
+    def search_for(self, w1, w2, search_for):
+        ''' find a trigram of the form (w1, w2, search_for) '''
+        results = []
+        if self.tagged:
+            for possibility in self.cache[(w1, w2)]:
+                if possibility[1] == search_for:
+                    results.append(possibility)
+        else:
+            for possibility in self.cache[(w1, w2)]:
+                if possibility == search_for:
+                    results.append(possibility)
+
+        #print "searching for:"+search_for, "w1="+str(w1), "w2="+str(w2), "results="+str(results)
+        return results
    
     def get_largest(self):
         ''' return the key of the item in the cache with the most possibilities '''
@@ -115,6 +147,16 @@ class Markov:
                 return False
         except:
             return False
+
+    def get_tags(self):
+        ''' return the different part-of-speech tags in the cache'''
+        tags = []
+        if self.istagged():
+            for possibilities in self.cache.values():
+                for possibility in possibilities:
+                    tags.append(possibility[1])
+            return sorted(set(tags))
+        return False
 
 if __name__ == "__main__":
     markov = Markov(nltk.corpus.brown.tagged_words(categories='science_fiction'), use_cache=False)
