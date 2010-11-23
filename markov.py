@@ -5,6 +5,26 @@ import random
 import nltk
 import cPickle as pickle
 
+def detokenize(tokens):
+    ''' humble attempt at converting a list of tokens into text '''
+    output = ''
+    for i, token in enumerate(tokens):
+        output += token
+        try:
+            next_word = tokens[i+1]
+        except IndexError:
+            next_word = ''
+
+        if token in '.':
+            output += "\n\n"
+        elif next_word in '.!?,\'\'"' or token == '``':
+            output += ''
+        else:
+            output += ' '
+
+    return output
+ 
+
 class Markov:
     def __init__(self, tokens, use_cache=False):
         self.tokens = tokens
@@ -41,10 +61,10 @@ class Markov:
         return cache
         
     def markov_text(self, w1=None, w2=None, length=100):
+        # TODO: some intelligence regarding opening and closing quotations
         if w1 is None and w2 is None:
             if not self.largest:
                 self.largest = self.get_largest()
-                print self.largest
             w1, w2 = self.largest
 
         results = []
@@ -58,8 +78,9 @@ class Markov:
             results.append(w2[0])
         else:
             results.append(w2)
-        return ' '.join(results)
-    
+
+        return detokenize(results)
+   
     def get_largest(self):
         ''' return the key of the item in the cache with the most possibilities '''
         most = 0
@@ -81,5 +102,5 @@ class Markov:
             return False
 
 if __name__ == "__main__":
-    markov = Markov(nltk.corpus.brown.tagged_words(), use_cache=True)
+    markov = Markov(nltk.corpus.brown.tagged_words(categories='science_fiction'), use_cache=False)
     print markov.markov_text()
