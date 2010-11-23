@@ -78,9 +78,15 @@ class Markov:
                     finished = True
 
             if current_tag == '(':
-                search_for = ')'
+                if search_for == ')':
+                    continue
+                else:
+                    search_for = ')'
             elif current_tag == "``":
-                search_for = "''"
+                if search_for == "''":
+                    continue
+                else:
+                    search_for = "''"
 
             if search_for:
                 search_results = self.search_for(w1, w2, search_for)
