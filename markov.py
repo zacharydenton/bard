@@ -30,7 +30,6 @@ class Markov:
         self.tokens = tokens
         self.trigrams = nltk.util.trigrams(self.tokens)
         self.cache = self.generate_cache(self.trigrams, use_cache)
-        self.largest = None
         self.tagged = self.istagged()
 
     def generate_cache(self, trigrams, use_cache):
@@ -63,9 +62,7 @@ class Markov:
     def markov_text(self, w1=None, w2=None, length=100):
         # TODO: some intelligence regarding opening and closing quotations
         if w1 is None and w2 is None:
-            if not self.largest:
-                self.largest = self.get_largest()
-            w1, w2 = self.largest
+            w1, w2 = self.get_starter()
 
         results = []
         for i in range(length):
@@ -90,6 +87,24 @@ class Markov:
                 most = len(possibilities)
                 largest = key
         return largest
+
+    def get_starter(self):
+        ''' return the key of the item in the cache which is best suited for starting the text. '''
+        most = 0
+        best = None
+        if self.istagged():
+            for (key, possibilities) in self.cache.items():
+                if key[0][0].istitle():
+                    if len(possibilities) > most:
+                        most = len(possibilities)
+                        best = key
+        else:
+            for (key, possibilities) in self.cache.items():
+                if key[0].istitle():
+                    if len(possibilities) > most:
+                        most = len(possibilities)
+                        best = key
+        return best
 
     def istagged(self):
         ''' determine whether our tokens are part-of-speech tagged or not '''
