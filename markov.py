@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # generate random text using trigrams and markov chains
 # this uses part-of-speech tagged data from the Brown corpus
+import sys
 import random
 import nltk
 import cPickle as pickle
@@ -15,7 +16,7 @@ def detokenize(tokens):
         except IndexError:
             next_word = ''
 
-        if next_word in '.!?,\'\'"' or token == '``':
+        if next_word in '.!?,\'\')";' or token in '(``':
             output += ''
         else:
             output += ' '
@@ -36,14 +37,14 @@ class Markov:
         # possible v3's 
         try:
             if use_cache:
-                print "loading markov cache..."
-                cachefile = open('.markov_cache', 'rb')
+                print >> sys.stderr, "loading trigram cache..."
+                cachefile = open('.trigram_cache', 'rb')
                 cache = pickle.load(cachefile)
                 cachefile.close()
             else:
                 raise Exception('Not using cache...')
         except:
-            print "generating trigrams cache..."
+            print >> sys.stderr, "generating trigram cache..."
             cache = {}
             for w1, w2, w3 in trigrams:
                 key = (w1, w2)
@@ -57,15 +58,24 @@ class Markov:
                 cachefile.close()
         return cache
         
-    def markov_text(self, w1=None, w2=None, length=100):
+    def pseudorandom_text(self, w1=None, w2=None, length=100):
+        ''' 
+        uses a Markov chain to produce pseudorandom text.
+
+        Contains some rules to ensure that the resultant text is logical;
+        however this may result in infinite loops if the source text is not 
+        large enough.
+        '''
         if w1 is None and w2 is None:
             w1, w2 = self.get_starter()
 
         results = []
-        search_for = None
+        search_for = []
+        exclude = ["''", ')']
         finished = False
-        previous = None
+        skip = False
         while not finished:
+            # append the current token to the results.
             if self.tagged:
                 current_tag = w1[1]
                 results.append(w1[0])
@@ -77,43 +87,73 @@ class Markov:
                 if len(results) >= length and not search_for and '.' in w1:
                     finished = True
 
+            # if something has been opened, try to close it.
             if current_tag == '(':
-                if search_for == ')':
-                    continue
-                else:
-                    search_for = ')'
+                search_for.append(')')
             elif current_tag == "``":
-                if search_for == "''":
-                    continue
-                else:
-                    search_for = "''"
+                search_for.append("''")
 
-            if search_for:
-                search_results = self.search_for(w1, w2, search_for)
-                if search_results:
-                    w1, w2 = w2, random.choice(search_results)
-                    search_for = None
-                else:
-                    w1, w2 = w2, random.choice(self.cache[(w1, w2)])
-            else:
-                w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+            # find the next token (but don't open anything if something is already open)
+            # we search for the token which will close the latest item opened.
+            try:
+                need = search_for[-1]
+            except IndexError:
+                need = None
+            try:
+                w1, w2 = self.get_next(w1, w2, need, exclude=exclude)
+                if need:
+                    search_for.pop()
+            except:
+                try:
+                    try:
+                        w1, w2 = self.get_next(w1, w2, None, exclude=exclude)
+                    except Exception as e:
+                        w1, w2 = self.get_next(w1, w2, None)
+                        print >> sys.stderr, "forced to append something which I wanted to exclude:", w2
+                except Exception as e:
+                    print >> sys.stderr, e
+                    return detokenize(results) + "."
     
         return detokenize(results)
 
-    def search_for(self, w1, w2, search_for):
-        ''' find a trigram of the form (w1, w2, search_for) '''
+    def markov_text(self, w1=None, w2=None, length=100):
+        ''' a pure version of the pseudorandom Markov chain text generator '''
+        if w1 is None and w2 is None:
+            w1, w2 = self.get_starter()
+
         results = []
+        for i in range(length):
+            if self.tagged:
+                results.append(w1[0])
+            else:
+                results.append(w1)
+
+            w1, w2 = w2, random.choice(self.cache[(w1, w2)])
+    
+        return detokenize(results)
+
+    def get_next(self, w1, w2, search_for, exclude=[]):
+        ''' find a trigram of the form (w1, w2, search_for) '''
+        results= []
         if self.tagged:
             for possibility in self.cache[(w1, w2)]:
-                if possibility[1] == search_for:
-                    results.append(possibility)
+                if search_for:
+                    if possibility[1] == search_for:
+                        results.append(possibility)
+                else:
+                    if possibility[0] not in exclude:
+                        results.append(possibility)
         else:
             for possibility in self.cache[(w1, w2)]:
-                if possibility == search_for:
-                    results.append(possibility)
+                if search_for:
+                    if possibility == search_for:
+                        results.append(possibility)
+                else:
+                    if possibility not in exclude:
+                        results.append(possibility)
 
-        #print "searching for:"+search_for, "w1="+str(w1), "w2="+str(w2), "results="+str(results)
-        return results
+        #print "searching for:"+str(search_for), "w1="+str(w1), "w2="+str(w2), "results="+str(results)
+        return w2, random.choice(results)
    
     def get_largest(self):
         ''' return the key of the item in the cache with the most possibilities '''
@@ -164,5 +204,5 @@ class Markov:
         return False
 
 if __name__ == "__main__":
-    markov = Markov(nltk.corpus.brown.tagged_words(categories='science_fiction'), use_cache=False)
-    print markov.markov_text()
+    markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction')), use_cache=False)
+    print markov.pseudorandom_text(length=200000)
