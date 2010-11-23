@@ -47,10 +47,10 @@ class Markov:
     def __init__(self, tokens, use_cache=False):
         self.tokens = tokens
         self.trigrams = nltk.util.trigrams(self.tokens)
-        self.cache = self.generate_cache(self.trigrams, use_cache)
+        self.cache = self._generate_cache(self.trigrams, use_cache)
         self.tagged = self.istagged()
 
-    def generate_cache(self, trigrams, use_cache):
+    def _generate_cache(self, trigrams, use_cache):
         ''' generate a dict from a list of trigrams where keys are (v1, v2) and value is list of possible v3's '''
         try:
             if use_cache:
@@ -79,9 +79,11 @@ class Markov:
         ''' 
         uses a Markov chain to produce pseudorandom text.
 
-        Contains some rules to ensure that the resultant text is logical;
-        however this may result in infinite loops if the source text is not 
-        large enough.
+        Contains some rules to ensure that the resultant text is logical,
+        such as trying to close quotations and parentheses and not inserting
+        quotations where they don't make sense. However, this is not always
+        possible and thus there will still be some misplaced quotation
+        marks and parentheses.
         '''
         print >> sys.stderr, "generating pseudorandom text..."
         if w1 is None and w2 is None:

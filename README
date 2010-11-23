@@ -18,9 +18,6 @@ CLASSES
      |  
      |  __init__(self, tokens, use_cache=False)
      |  
-     |  generate_cache(self, trigrams, use_cache)
-     |      generate a dict from a list of trigrams where keys are (v1, v2) and value is list of possible v3's
-     |  
      |  get_largest(self)
      |      return the key of the item in the cache with the most possibilities
      |  
@@ -42,9 +39,11 @@ CLASSES
      |  pseudorandom_text(self, w1=None, w2=None, length=100)
      |      uses a Markov chain to produce pseudorandom text.
      |      
-     |      Contains some rules to ensure that the resultant text is logical;
-     |      however this may result in infinite loops if the source text is not 
-     |      large enough.
+     |      Contains some rules to ensure that the resultant text is logical,
+     |      such as trying to close quotations and parentheses and not inserting
+     |      quotations where they don't make sense. However, this is not always
+     |      possible and thus there will still be some misplaced quotation
+     |      marks and parentheses.
 
 FUNCTIONS
     detokenize(tokens)
