@@ -8,26 +8,36 @@ import cPickle as pickle
 
 def detokenize(tokens):
     ''' humble attempt at converting a list of tokens into text '''
-    # we make a copy of the tokens, to remove any duplicate punctuation
-    copy = tokens[:]
-    for i, token in enumerate(copy):
-        try:
-            if copy[i] == copy[i+1] and token in "!.?":
-                tokens[i] = ''
-        except:
-            pass
+    print >> sys.stderr, "detokenizing tokens..."
 
     output = ''
     for i, token in enumerate(tokens):
-        output += token
+        # next token; previous token
         try:
-            next_word = tokens[i+1]
+            next_token = tokens[i+1]
         except IndexError:
-            next_word = ''
-
-        if next_word in '.!?,\'\')";:' or token in '(``':
-            output += ''
+            next_token = ''
+        if i != 0:
+            prev_token = tokens[i-1]
         else:
+            prev_token = ''
+
+        # skip double punctuation.
+        if token == next_token and token in "!.?;":
+            continue
+
+        # add the token to the output.
+        output += token
+
+        # add spacing.
+        if next_token in '.!?,\'\')";:' or token in '(``':
+            # punctuation does not require spacing
+            output += ''
+        elif (token in "!?." and prev_token == "''") or (token in "!?." and next_token == "``"):
+            # this is dialogue, put it on its own line
+            output += '\n\n'
+        else:
+            # normal text; just add a space
             output += ' '
 
     return output
@@ -75,6 +85,7 @@ class Markov:
         however this may result in infinite loops if the source text is not 
         large enough.
         '''
+        print >> sys.stderr, "generating pseudorandom text..."
         if w1 is None and w2 is None:
             w1, w2 = self.get_starter()
 
@@ -82,7 +93,6 @@ class Markov:
         search_for = []
         exclude = ["''", ')']
         finished = False
-        skip = False
         while not finished:
             # append the current token to the results.
             if self.tagged:
@@ -213,5 +223,5 @@ class Markov:
         return False
 
 if __name__ == "__main__":
-    markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction', 'romance', 'adventure')), use_cache=True)
-    print markov.pseudorandom_text(length=200000)
+    markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction')), use_cache=False)
+    print markov.pseudorandom_text(length=1000)
