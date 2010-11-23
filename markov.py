@@ -15,9 +15,7 @@ def detokenize(tokens):
         except IndexError:
             next_word = ''
 
-        if token in '.':
-            output += "\n\n"
-        elif next_word in '.!?,\'\'"' or token == '``':
+        if next_word in '.!?,\'\'"' or token == '``':
             output += ''
         else:
             output += ' '
@@ -60,19 +58,24 @@ class Markov:
         return cache
         
     def markov_text(self, w1=None, w2=None, length=100):
-        # TODO: some intelligence regarding opening and closing quotations
         if w1 is None and w2 is None:
             w1, w2 = self.get_starter()
 
         results = []
         search_for = None
-        for i in range(length):
+        finished = False
+        previous = None
+        while not finished:
             if self.tagged:
                 current_tag = w1[1]
                 results.append(w1[0])
+                if len(results) >= length and not search_for and '.' in w1[0]:
+                    finished = True
             else:
                 current_tag = w1
                 results.append(w1)
+                if len(results) >= length and not search_for and '.' in w1:
+                    finished = True
 
             if current_tag == '(':
                 search_for = ')'
@@ -88,11 +91,7 @@ class Markov:
                     w1, w2 = w2, random.choice(self.cache[(w1, w2)])
             else:
                 w1, w2 = w2, random.choice(self.cache[(w1, w2)])
-        if self.tagged:
-            results.append(w2[0])
-        else:
-            results.append(w2)
-
+    
         return detokenize(results)
 
     def search_for(self, w1, w2, search_for):
