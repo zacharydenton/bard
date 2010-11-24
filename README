@@ -11,12 +11,23 @@ DESCRIPTION
     # supports plain text and part-of-speech tagged text.
 
 CLASSES
-    Markov
+    MarkovTextGenerator
     
-    class Markov
+    class MarkovTextGenerator
+     |  Uses a Markov chain to generate random text from a list of tokens.
+     |  
+     |  The tokens can be POS-tagged (a list of tuples) or not (a list of strings).
+     |  
      |  Methods defined here:
      |  
      |  __init__(self, tokens, use_cache=False)
+     |      Initializes the MarkovTextGenerator.
+     |      
+     |      If use_cache is True, the MarkovTextGenerator will attempt to
+     |      use a pickled version of the trigram index. This provides a performance
+     |      benefit on large corpora (such as the entire Brown corpus) but is slightly
+     |      slower with smaller corpora (such as the science fiction category of the Brown
+     |      corpus).
      |  
      |  get_largest(self)
      |      return the key of the item in the cache with the most possibilities
@@ -34,19 +45,63 @@ CLASSES
      |      determine whether our tokens are part-of-speech tagged or not
      |  
      |  markov_text(self, w1=None, w2=None, length=100)
-     |      a pure version of the pseudorandom Markov chain text generator
+     |      A pure version of the pseudorandom Markov chain text generator 
+     |      
+     |      w1 -> starting word
+     |      w2 -> second word
+     |      length -> number of tokens to produce
+     |      
+     |      This version does not have any additional intelligence, so it will produce
+     |      illogical sentences. However, it will always produce the correct length.
+     |      
+     |          >>> tokens = nltk.corpus.brown.tagged_words(categories="fiction")
+     |          >>> m = MarkovTextGenerator(tokens)
+     |          >>> text = m.markov_text(length=100)
+     |          >>> isinstance(text, str)
+     |          True
      |  
      |  pseudorandom_text(self, w1=None, w2=None, length=100)
      |      uses a Markov chain to produce pseudorandom text.
+     |      
+     |      w1 -> starting word
+     |      w2 -> second word
+     |      length -> try to produce this many tokens
      |      
      |      Contains some rules to ensure that the resultant text is logical,
      |      such as trying to close quotations and parentheses and not inserting
      |      quotations where they don't make sense. However, this is not always
      |      possible and thus there will still be some misplaced quotation
-     |      marks and parentheses.
+     |      marks and parentheses. Furthermore, this function will not stop producing
+     |      text until it is satisfied that parentheses and quotations have been closed
+     |      and the last character marks the end of a sentence.
+     |      
+     |          >>> tokens = nltk.corpus.brown.tagged_words(categories='fiction')
+     |          >>> m = MarkovTextGenerator(tokens)
+     |          >>> text = m.pseudorandom_text(length=100)
+     |          >>> isinstance(text, str)
+     |          True
 
 FUNCTIONS
     detokenize(tokens)
-        humble attempt at converting a list of tokens into text
+        A humble attempt at converting a list of tokens into text.
+        
+        Pass a list of tokens, and you will receive a string formatted
+        like a novel. Dialogue is placed on its own line.
+        
+            >>> tokens = ['``', 'What', '...', 'is', 'the', 'airspeed', 'velocity', 'of', 'an', 'unladen', 'swallow', '?', "''",                       '``', 'African', 'or', 'European', '?', "''",                       '``', 'I', 'do', "n't", "know", "that", '!', "''"]
+            >>> sentence = detokenize(tokens)
+            >>> print sentence
+            ``What... is the airspeed velocity of an unladen swallow?''
+            <BLANKLINE>
+            ``African or European?''
+            <BLANKLINE>
+            ``I don't know that!''
+        
+            >>> tokens = ['``', 'It', 'is', 'but', 'a', 'scratch', '.', "''",                       '``', 'No', 'it', "'s", "not", '!', "Your", "arm", "'s", "off", "!", "''"]
+            >>> sentence = detokenize(tokens)
+            >>> print sentence
+            ``It is but a scratch.''
+            <BLANKLINE>
+            ``No it's not! Your arm's off!''
 
 
