@@ -39,7 +39,7 @@ class RegexDetokenizer:
             if next_token in '...!?.,\'\')";:' or token in '(``':
                 # punctuation does not require spacing
                 output += ''
-            elif re.search("\'\w+", next_token):
+            elif re.search("\'\w+", next_token) and len(next_token) <= 3:
                 # don't put space in the middle of contractions
                 output += ''
             elif ((token in "!?." and prev_token == "''") or 
