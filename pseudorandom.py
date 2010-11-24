@@ -1,14 +1,40 @@
 #!/usr/bin/env python
 # generate random text using trigrams and markov chains
 # supports plain text and part-of-speech tagged text.
+import re
 import sys
 import random
 import nltk
 import cPickle as pickle
 
 def detokenize(tokens):
-    ''' humble attempt at converting a list of tokens into text '''
-    print >> sys.stderr, "detokenizing tokens..."
+    '''
+    A humble attempt at converting a list of tokens into text.
+
+    Pass a list of tokens, and you will receive a string formatted
+    like a novel. Dialogue is placed on its own line.
+
+        >>> tokens = ['``', 'What', '...', 'is', 'the', 'airspeed', 'velocity', 'of', 'an', 'unladen', 'swallow', '?', "''", \
+                      '``', 'African', 'or', 'European', '?', "''", \
+                      '``', 'I', 'do', "n't", "know", "that", '!', "''"]
+        >>> sentence = detokenize(tokens)
+        >>> print sentence
+        ``What... is the airspeed velocity of an unladen swallow?''
+        <BLANKLINE>
+        ``African or European?''
+        <BLANKLINE>
+        ``I don't know that!''
+
+        >>> tokens = ['``', 'It', 'is', 'but', 'a', 'scratch', '.', "''", \
+                      '``', 'No', 'it', "'s", "not", '!', "Your", "arm", "'s", "off", "!", "''"]
+        >>> sentence = detokenize(tokens)
+        >>> print sentence
+        ``It is but a scratch.''
+        <BLANKLINE>
+        ``No it's not! Your arm's off!''
+
+    '''
+    #print >> sys.stderr, "detokenizing tokens..."
 
     output = ''
     for i, token in enumerate(tokens):
@@ -30,10 +56,15 @@ def detokenize(tokens):
         output += token
 
         # add spacing.
-        if next_token in '.!?,\'\')";:' or token in '(``':
+        if next_token in '...!?.,\'\')";:' or token in '(``':
             # punctuation does not require spacing
             output += ''
-        elif (token in "!?." and prev_token == "''") or (token in "!?." and next_token == "``"):
+        elif re.search("\'\w+", next_token):
+            # don't put space in the middle of contractions
+            output += ''
+        elif ((token in "!?." and prev_token == "''") or 
+              (token in "!?." and next_token == "``") or
+              (token in "''" and prev_token in "!?.")):
             # this is dialogue, put it on its own line
             output += '\n\n'
         else:
@@ -43,25 +74,44 @@ def detokenize(tokens):
     return output
  
 
-class Markov:
+class MarkovTextGenerator:
+    '''
+    Uses a Markov chain to generate random text from a list of tokens.
+
+    The tokens can be POS-tagged (a list of tuples) or not (a list of strings).
+
+    '''
+
     def __init__(self, tokens, use_cache=False):
+        '''
+        Initializes the MarkovTextGenerator.
+
+        If use_cache is True, the MarkovTextGenerator will attempt to
+        use a pickled version of the trigram index. This provides a performance
+        benefit on large corpora (such as the entire Brown corpus) but is slightly
+        slower with smaller corpora (such as the science fiction category of the Brown
+        corpus).
+        '''
+
         self.tokens = tokens
         self.trigrams = nltk.util.trigrams(self.tokens)
         self.cache = self._generate_cache(self.trigrams, use_cache)
         self.tagged = self.istagged()
 
     def _generate_cache(self, trigrams, use_cache):
-        ''' generate a dict from a list of trigrams where keys are (v1, v2) and value is list of possible v3's '''
+        ''' generate a trigram index from a list of trigrams
+        
+        where keys are (v1, v2) and value is list of possible v3's '''
         try:
             if use_cache:
-                print >> sys.stderr, "loading trigram cache..."
+                #print >> sys.stderr, "loading trigram cache..."
                 cachefile = open('.trigram_cache', 'rb')
                 cache = pickle.load(cachefile)
                 cachefile.close()
             else:
                 raise Exception('Not using cache...')
         except:
-            print >> sys.stderr, "generating trigram cache..."
+            #print >> sys.stderr, "generating trigram cache..."
             cache = {}
             for w1, w2, w3 in trigrams:
                 key = (w1, w2)
@@ -79,13 +129,26 @@ class Markov:
         ''' 
         uses a Markov chain to produce pseudorandom text.
 
+        w1 -> starting word
+        w2 -> second word
+        length -> try to produce this many tokens
+
         Contains some rules to ensure that the resultant text is logical,
         such as trying to close quotations and parentheses and not inserting
         quotations where they don't make sense. However, this is not always
         possible and thus there will still be some misplaced quotation
-        marks and parentheses.
+        marks and parentheses. Furthermore, this function will not stop producing
+        text until it is satisfied that parentheses and quotations have been closed
+        and the last character marks the end of a sentence.
+
+            >>> tokens = nltk.corpus.brown.tagged_words(categories='fiction')
+            >>> m = MarkovTextGenerator(tokens)
+            >>> text = m.pseudorandom_text(length=100)
+            >>> isinstance(text, str)
+            True
+
         '''
-        print >> sys.stderr, "generating pseudorandom text..."
+        #print >> sys.stderr, "generating pseudorandom text..."
         if w1 is None and w2 is None:
             w1, w2 = self.get_starter()
 
@@ -98,12 +161,12 @@ class Markov:
             if self.tagged:
                 current_tag = w1[1]
                 results.append(w1[0])
-                if len(results) >= length and not search_for and '.' in w1[0]:
+                if len(results) >= length and not search_for and '.!?' in w1[0]:
                     finished = True
             else:
                 current_tag = w1
                 results.append(w1)
-                if len(results) >= length and not search_for and '.' in w1:
+                if len(results) >= length and not search_for and '.!?' in w1:
                     finished = True
 
             # if something has been opened, try to close it.
@@ -136,7 +199,23 @@ class Markov:
         return detokenize(results)
 
     def markov_text(self, w1=None, w2=None, length=100):
-        ''' a pure version of the pseudorandom Markov chain text generator '''
+        ''' 
+        A pure version of the pseudorandom Markov chain text generator 
+        
+        w1 -> starting word
+        w2 -> second word
+        length -> number of tokens to produce
+
+        This version does not have any additional intelligence, so it will produce
+        illogical sentences. However, it will always produce the correct length.
+
+            >>> tokens = nltk.corpus.brown.tagged_words(categories="fiction")
+            >>> m = MarkovTextGenerator(tokens)
+            >>> text = m.markov_text(length=100)
+            >>> isinstance(text, str)
+            True
+
+        '''
         if w1 is None and w2 is None:
             w1, w2 = self.get_starter()
 
@@ -223,9 +302,5 @@ class Markov:
         return False
 
 if __name__ == "__main__":
-    try:
-        limit = int(sys.argv[1])
-    except IndexError:
-        limit = 100
-    markov = Markov(nltk.corpus.brown.tagged_words(categories=('science_fiction')), use_cache=False)
-    print markov.pseudorandom_text(length=limit)
+    import doctest
+    doctest.testmod()
