@@ -1,0 +1,3 @@
+#!/usr/bin/env python
+import pseudorandom
+print pseudorandom.generate_text()

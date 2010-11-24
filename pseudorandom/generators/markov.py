@@ -200,19 +200,30 @@ class IntelligentMarkovGenerator(MarkovGenerator):
                 current_tag = w1[1]
                 #results.append(w1[0])
                 results.append(w1)
-                if len(results) >= length and not search_for and '.!?' in w1[0]:
+                if len(results) >= length and w1[0] in '.!?':
+                    if search_for:
+                        if isinstance(search_for, list) and len(search_for) > 1:
+                            results.append(search_for.pop())
+                        else:
+                            results.append(search_for)
                     finished = True
             else:
                 current_tag = w1
                 results.append(w1)
-                if len(results) >= length and not search_for and '.!?' in w1:
+                if len(results) >= length and w1 in '.!?':
+                    if search_for:
+                        if isinstance(search_for, list) and len(search_for) > 1:
+                            results.append(search_for.pop())
+                        else:
+                            results.append(search_for)
                     finished = True
 
             # if something has been opened, try to close it.
-            if current_tag == '(':
-                search_for.append(')')
-            elif current_tag == "``":
-                search_for.append("''")
+            if len(results) < length:
+                if current_tag == '(':
+                    search_for.append(')')
+                elif current_tag == "``":
+                    search_for.append("''")
 
             # find the next token (but don't open anything if something is already open)
             # we search for the token which will close the latest item opened.
