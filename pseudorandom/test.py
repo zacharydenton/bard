@@ -2,8 +2,8 @@
 import unittest
 import doctest
 
-from detokenizers.tests import *
-from generators.tests import *
+import detokenizers; from detokenizers.tests import *
+import generators; from generators.tests import *
 
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(detokenizers))

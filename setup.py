@@ -11,6 +11,6 @@ setup (
     author = 'Zach Denton',
     author_email = 'zacharydenton@gmail.com',
     url = 'http://zacharydenton.com/',
-    description = "A module to generate pseudorandom text.",
+    description = "A module which generates pseudorandom text.",
     py_modules = ['pseudorandom']
 )

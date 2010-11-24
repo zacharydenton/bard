@@ -1,5 +1,5 @@
 """
-A module to generate pseudorandom text.
+A module which generates pseudorandom text.
 
 It utilizes Markov chains to produce new text based on
 some input text. You could use it, for example, to write a
