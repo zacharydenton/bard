@@ -1,6 +1,17 @@
 #!/usr/bin/env python
-# generate random text using trigrams and markov chains
-# supports plain text and part-of-speech tagged text.
+"""
+A module to generate pseudorandom text.
+
+It utilizes Markov chains to produce new text based on
+some input text. You could use it, for example, to write a
+ten million word science fiction epic using the science
+fiction category of the Brown corpus (yes, I have done it).
+
+This module requires NLTK.
+"""
+__author__ = 'Zach Denton'
+__version__ = '0.2'
+
 import re
 import sys
 import random
@@ -129,9 +140,10 @@ class MarkovTextGenerator:
         ''' 
         uses a Markov chain to produce pseudorandom text.
 
-        w1 -> starting word
-        w2 -> second word
-        length -> try to produce this many tokens
+        Keyword arguments:
+        w1      -- starting word
+        w2      -- second word
+        length  -- try to produce this many tokens
 
         Contains some rules to ensure that the resultant text is logical,
         such as trying to close quotations and parentheses and not inserting
@@ -202,9 +214,10 @@ class MarkovTextGenerator:
         ''' 
         A pure version of the pseudorandom Markov chain text generator 
         
-        w1 -> starting word
-        w2 -> second word
-        length -> number of tokens to produce
+        Keyword arguments:
+        w1      -- starting word
+        w2      -- second word
+        length  -- number of tokens to produce
 
         This version does not have any additional intelligence, so it will produce
         illogical sentences. However, it will always produce the correct length.

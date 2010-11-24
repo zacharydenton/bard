@@ -1,14 +1,18 @@
 Help on module pseudorandom:
 
 NAME
-    pseudorandom
+    pseudorandom - A module to generate pseudorandom text.
 
 FILE
     /home/zdenton/bin/py/pseudorandom/pseudorandom.py
 
 DESCRIPTION
-    # generate random text using trigrams and markov chains
-    # supports plain text and part-of-speech tagged text.
+    It utilizes Markov chains to produce new text based on
+    some input text. You could use it, for example, to write a
+    ten million word science fiction epic using the science
+    fiction category of the Brown corpus (yes, I have done it).
+    
+    This module requires NLTK.
 
 CLASSES
     MarkovTextGenerator
@@ -47,9 +51,10 @@ CLASSES
      |  markov_text(self, w1=None, w2=None, length=100)
      |      A pure version of the pseudorandom Markov chain text generator 
      |      
-     |      w1 -> starting word
-     |      w2 -> second word
-     |      length -> number of tokens to produce
+     |      Keyword arguments:
+     |      w1      -- starting word
+     |      w2      -- second word
+     |      length  -- number of tokens to produce
      |      
      |      This version does not have any additional intelligence, so it will produce
      |      illogical sentences. However, it will always produce the correct length.
@@ -63,9 +68,10 @@ CLASSES
      |  pseudorandom_text(self, w1=None, w2=None, length=100)
      |      uses a Markov chain to produce pseudorandom text.
      |      
-     |      w1 -> starting word
-     |      w2 -> second word
-     |      length -> try to produce this many tokens
+     |      Keyword arguments:
+     |      w1      -- starting word
+     |      w2      -- second word
+     |      length  -- try to produce this many tokens
      |      
      |      Contains some rules to ensure that the resultant text is logical,
      |      such as trying to close quotations and parentheses and not inserting
@@ -103,5 +109,15 @@ FUNCTIONS
             ``It is but a scratch.''
             <BLANKLINE>
             ``No it's not! Your arm's off!''
+
+DATA
+    __author__ = 'Zach Denton'
+    __version__ = '0.2'
+
+VERSION
+    0.2
+
+AUTHOR
+    Zach Denton
 
 
