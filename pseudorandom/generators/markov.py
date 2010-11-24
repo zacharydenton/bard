@@ -126,19 +126,13 @@ class MarkovGenerator:
     def get_starter(self):
         ''' return the key of the item in the cache which is best suited for starting the text. '''
         most = 0
-        best = None
         if self.istagged():
-            for (key, possibilities) in self.cache.items():
-                if key[0][0].istitle():
-                    if len(possibilities) > most:
-                        most = len(possibilities)
-                        best = key
+            most = max(len(possibilities) for (key, possibilities) in self.cache.items() if key[0][0].istitle())
+            best = random.choice([key for (key, possibilities) in self.cache.items() if (len(possibilities) >= most - 5) and key[0][0].istitle()])
         else:
-            for (key, possibilities) in self.cache.items():
-                if key[0].istitle():
-                    if len(possibilities) > most:
-                        most = len(possibilities)
-                        best = key
+            most = max(len(possibilities) for (key, possibilities) in self.cache.items() if key[0].istitle())
+            best = random.choice([key for (key, possibilities) in self.cache.items() if (len(possibilities) >= most - 5) and key[0].istitle()])
+
         return best
 
     def istagged(self):
