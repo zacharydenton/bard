@@ -135,6 +135,10 @@ class MarkovGenerator:
 
         return best
 
+    def get_random(self):
+        ''' return a random item. '''
+        return random.choice(self.cache.keys())
+
     def istagged(self):
         ''' determine whether our tokens are part-of-speech tagged or not '''
         try:
@@ -231,13 +235,10 @@ class IntelligentMarkovGenerator(MarkovGenerator):
                     search_for.pop()
             except:
                 try:
-                    try:
-                        w1, w2 = self.get_next(w1, w2, None, exclude=exclude)
-                    except Exception as e:
-                        w1, w2 = self.get_next(w1, w2, None)
-                        #print >> sys.stderr, "forced to append something which I wanted to exclude:", w2
+                    w1, w2 = self.get_next(w1, w2, None, exclude=exclude)
                 except Exception as e:
-                    return results
+                    # we got stuck; let's start over.
+                    w1, w2 = self.get_random()
     
         return results
 
