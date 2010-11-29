@@ -1,3 +1,2 @@
-README
-pseudorandom.py
-setup.py
+include pseudo README
+recursive-include pseudorandom/ *
