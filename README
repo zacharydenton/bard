@@ -1,10 +1,10 @@
-Help on module pseudorandom:
+Help on package bard:
 
 NAME
-    pseudorandom - A module to generate pseudorandom text.
+    bard - A module which generates pseudorandom text.
 
 FILE
-    /home/zdenton/bin/py/pseudorandom/pseudorandom.py
+    /home/zdenton/bin/py/bard/bard/__init__.py
 
 DESCRIPTION
     It utilizes Markov chains to produce new text based on
@@ -14,101 +14,18 @@ DESCRIPTION
     
     This module requires NLTK.
 
-CLASSES
-    MarkovTextGenerator
-    
-    class MarkovTextGenerator
-     |  Uses a Markov chain to generate random text from a list of tokens.
-     |  
-     |  The tokens can be POS-tagged (a list of tuples) or not (a list of strings).
-     |  
-     |  Methods defined here:
-     |  
-     |  __init__(self, tokens, use_cache=False)
-     |      Initializes the MarkovTextGenerator.
-     |      
-     |      If use_cache is True, the MarkovTextGenerator will attempt to
-     |      use a pickled version of the trigram index. This provides a performance
-     |      benefit on large corpora (such as the entire Brown corpus) but is slightly
-     |      slower with smaller corpora (such as the science fiction category of the Brown
-     |      corpus).
-     |  
-     |  get_largest(self)
-     |      return the key of the item in the cache with the most possibilities
-     |  
-     |  get_next(self, w1, w2, search_for, exclude=[])
-     |      find a trigram of the form (w1, w2, search_for)
-     |  
-     |  get_starter(self)
-     |      return the key of the item in the cache which is best suited for starting the text.
-     |  
-     |  get_tags(self)
-     |      return the different part-of-speech tags in the cache
-     |  
-     |  istagged(self)
-     |      determine whether our tokens are part-of-speech tagged or not
-     |  
-     |  markov_text(self, w1=None, w2=None, length=100)
-     |      A pure version of the pseudorandom Markov chain text generator 
-     |      
-     |      Keyword arguments:
-     |      w1      -- starting word
-     |      w2      -- second word
-     |      length  -- number of tokens to produce
-     |      
-     |      This version does not have any additional intelligence, so it will produce
-     |      illogical sentences. However, it will always produce the correct length.
-     |      
-     |          >>> tokens = nltk.corpus.brown.tagged_words(categories="fiction")
-     |          >>> m = MarkovTextGenerator(tokens)
-     |          >>> text = m.markov_text(length=100)
-     |          >>> isinstance(text, str)
-     |          True
-     |  
-     |  pseudorandom_text(self, w1=None, w2=None, length=100)
-     |      uses a Markov chain to produce pseudorandom text.
-     |      
-     |      Keyword arguments:
-     |      w1      -- starting word
-     |      w2      -- second word
-     |      length  -- try to produce this many tokens
-     |      
-     |      Contains some rules to ensure that the resultant text is logical,
-     |      such as trying to close quotations and parentheses and not inserting
-     |      quotations where they don't make sense. However, this is not always
-     |      possible and thus there will still be some misplaced quotation
-     |      marks and parentheses. Furthermore, this function will not stop producing
-     |      text until it is satisfied that parentheses and quotations have been closed
-     |      and the last character marks the end of a sentence.
-     |      
-     |          >>> tokens = nltk.corpus.brown.tagged_words(categories='fiction')
-     |          >>> m = MarkovTextGenerator(tokens)
-     |          >>> text = m.pseudorandom_text(length=100)
-     |          >>> isinstance(text, str)
-     |          True
+PACKAGE CONTENTS
+    detokenizers (package)
+    generators (package)
+    test
+
+SUBMODULES
+    markov
+    regex
+    sentence
 
 FUNCTIONS
-    detokenize(tokens)
-        A humble attempt at converting a list of tokens into text.
-        
-        Pass a list of tokens, and you will receive a string formatted
-        like a novel. Dialogue is placed on its own line.
-        
-            >>> tokens = ['``', 'What', '...', 'is', 'the', 'airspeed', 'velocity', 'of', 'an', 'unladen', 'swallow', '?', "''",                       '``', 'African', 'or', 'European', '?', "''",                       '``', 'I', 'do', "n't", "know", "that", '!', "''"]
-            >>> sentence = detokenize(tokens)
-            >>> print sentence
-            ``What... is the airspeed velocity of an unladen swallow?''
-            <BLANKLINE>
-            ``African or European?''
-            <BLANKLINE>
-            ``I don't know that!''
-        
-            >>> tokens = ['``', 'It', 'is', 'but', 'a', 'scratch', '.', "''",                       '``', 'No', 'it', "'s", "not", '!', "Your", "arm", "'s", "off", "!", "''"]
-            >>> sentence = detokenize(tokens)
-            >>> print sentence
-            ``It is but a scratch.''
-            <BLANKLINE>
-            ``No it's not! Your arm's off!''
+    generate_text(length=100)
 
 DATA
     __author__ = 'Zach Denton'
