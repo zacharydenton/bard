@@ -18,8 +18,6 @@ __version__ = '0.2'
 import detokenizers; from detokenizers import *
 import generators; from generators import *
 
-def generate_text(corpus=None, length=100):
-    if corpus is None:
-        corpus = nltk.corpus.brown.tagged_words(categories='fiction')
-    tokens = generate(corpus, length=length)
+def generate_text(length=100):
+    tokens = generate(corpus=None, length=length)
     return detokenize(tokens)

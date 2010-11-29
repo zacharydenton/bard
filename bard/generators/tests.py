@@ -2,6 +2,7 @@ import unittest
 import nltk
 
 import markov
+import sentence
 
 class TestMarkov(unittest.TestCase):
     def setUp(self):
@@ -24,4 +25,11 @@ class TestIntelligentMarkov(TestMarkov):
         self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='fiction')
         self.generator = markov.IntelligentMarkovGenerator(self.tokens)
         self.tagged_generator = markov.IntelligentMarkovGenerator(self.tagged_tokens)
+
+class TestSentenceBased(TestMarkov):
+    def setUp(self):
+        self.tokens = nltk.corpus.brown.words(categories='fiction')
+        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='fiction')
+        self.generator = sentence.SentenceBasedGenerator(self.tokens)
+        self.tagged_generator = sentence.SentenceBasedGenerator(self.tagged_tokens)
 

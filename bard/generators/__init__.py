@@ -2,11 +2,11 @@
 import markov
 import nltk
 
-__all__ = ["markov", "generate"]
+__all__ = ["markov", "generate", "sentence"]
 
-def generate(corpus=None, w1=None, w2=None, length=100):
+def generate(corpus=None, length=100):
     '''use the best text generator to generate some pseudorandom text'''
     if corpus is None:
-        corpus = nltk.corpus.brown.tagged_words(categories='fiction')
+        corpus = nltk.corpus.brown.tagged_words(categories='science_fiction')
     generator = markov.IntelligentMarkovGenerator(corpus)
-    return generator.generate(w1, w2, length)
+    return generator.generate(length=length)
