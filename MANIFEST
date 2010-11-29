@@ -1,2 +1,2 @@
-include pseudo README
-recursive-include pseudorandom/ *
+include bard-tale README
+recursive-include bard/ *
