@@ -1,4 +1,5 @@
+MANIFEST
 *.pyc
 *.swp
 dist/*
-MANIFEST
+build/*

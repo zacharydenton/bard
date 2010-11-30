@@ -21,6 +21,5 @@ setup (
                 'bard.detokenizers',
                ],
     scripts = ['bard-tale'],
-    data_files = [('doc', ['doc/*'])],
     requires = ['nltk']
 )
