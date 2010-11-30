@@ -1,7 +1,7 @@
 import unittest
 import nltk
 
-from bard.detokenizers import *
+from bard.detokenizers import regex
 
 class TestDetokenizer(unittest.TestCase):
     def setUp(self):
@@ -26,12 +26,6 @@ class TestDetokenizer(unittest.TestCase):
         detokenizer = regex.RegexDetokenizer()
         tagged_result = detokenizer.detokenize(self.tagged_tokens)
         self.assertEqual(tagged_result, self.correct_response)
-
-    def test_default(self):
-        self.assertEqual(detokenize(self.tokens), self.correct_response)
-
-    def test_default_tagged(self):
-        self.assertEqual(detokenize(self.tagged_tokens), self.correct_response)
 
 
 

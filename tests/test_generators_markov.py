@@ -1,12 +1,12 @@
 import unittest
 import nltk
 
-from bard.generators import *
+from bard.generators import markov
 
 class TestMarkov(unittest.TestCase):
     def setUp(self):
-        self.tokens = nltk.corpus.brown.words(categories='fiction')
-        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='fiction')
+        self.tokens = nltk.corpus.brown.words(categories='science_fiction')
+        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='science_fiction')
         self.generator = markov.MarkovGenerator(self.tokens)
         self.tagged_generator = markov.MarkovGenerator(self.tagged_tokens)
 
@@ -20,15 +20,8 @@ class TestMarkov(unittest.TestCase):
 
 class TestIntelligentMarkov(TestMarkov):
     def setUp(self):
-        self.tokens = nltk.corpus.brown.words(categories='fiction')
-        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='fiction')
+        self.tokens = nltk.corpus.brown.words(categories='science_fiction')
+        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='science_fiction')
         self.generator = markov.IntelligentMarkovGenerator(self.tokens)
         self.tagged_generator = markov.IntelligentMarkovGenerator(self.tagged_tokens)
-
-class TestSentenceBased(TestMarkov):
-    def setUp(self):
-        self.tokens = nltk.corpus.brown.words(categories='fiction')
-        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='fiction')
-        self.generator = sentence.SentenceBasedGenerator(self.tokens)
-        self.tagged_generator = sentence.SentenceBasedGenerator(self.tagged_tokens)
 
