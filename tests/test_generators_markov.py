@@ -25,3 +25,11 @@ class TestIntelligentMarkov(TestMarkov):
         self.generator = markov.IntelligentMarkovGenerator(self.tokens)
         self.tagged_generator = markov.IntelligentMarkovGenerator(self.tagged_tokens)
 
+class TestGeneratorFunctions(unittest.TestCase):
+    def setUp(self):
+        self.tokens = nltk.corpus.brown.words(categories='science_fiction')
+        self.tagged_tokens = nltk.corpus.brown.tagged_words(categories='science_fiction')
+        self.generator = markov.MarkovGenerator(self.tokens)
+        self.tagged_generator = markov.MarkovGenerator(self.tagged_tokens)
+
+
