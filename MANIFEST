@@ -1,2 +1,12 @@
-include bard-tale README
-recursive-include bard/ *
+README
+bard-tale
+setup.py
+bard/__init__.py
+bard/test.py
+bard/detokenizers/__init__.py
+bard/detokenizers/regex.py
+bard/detokenizers/tests.py
+bard/generators/__init__.py
+bard/generators/markov.py
+bard/generators/sentence.py
+bard/generators/tests.py
