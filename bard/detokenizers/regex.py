@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import re
 
-from base import *
-
 class Token(str):
     def iscontraction(self):
         '''
@@ -71,7 +69,7 @@ class Token(str):
                 return True
         return False
 
-class RegexDetokenizer(Detokenizer):
+class RegexDetokenizer:
     def detokenize(self, tokens):
         '''
         A regex-based detokenizer.
