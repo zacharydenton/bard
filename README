@@ -17,7 +17,6 @@ DESCRIPTION
 PACKAGE CONTENTS
     detokenizers (package)
     generators (package)
-    test
 
 SUBMODULES
     markov
@@ -29,6 +28,10 @@ FUNCTIONS
 
 DATA
     __author__ = 'Zach Denton'
+    __author_email__ = 'zacharydenton@gmail.com'
+    __classifiers__ = ['Topic :: Text Processing']
+    __longdescr__ = '\nA module for natural language generation. It co...t...
+    __url__ = 'http://zacharydenton.com/code/bard/'
     __version__ = '0.2'
 
 VERSION
