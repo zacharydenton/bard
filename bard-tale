@@ -1,4 +1,17 @@
 #!/usr/bin/env python
 # use the bard module to tell a tale
+import argparse
+import nltk
 import bard
-print bard.generate_text()
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--genre', choices=nltk.corpus.brown.categories(), default='science_fiction')
+    parser.add_argument('-l', '--length', help='number of tokens to generate', default=100, type=int)
+    args = parser.parse_args()
+
+    corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
+    print bard.generate_text(corpus=corpus, length=args.length)
+
+if __name__ == "__main__":
+    main()

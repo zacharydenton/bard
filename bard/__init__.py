@@ -30,6 +30,6 @@ __classifiers__ = [
 import detokenizers; from detokenizers import *
 import generators; from generators import *
 
-def generate_text(length=100):
-    tokens = generate(corpus=None, length=length)
+def generate_text(length=100,corpus=None):
+    tokens = generate(corpus=corpus, length=length)
     return detokenize(tokens)
