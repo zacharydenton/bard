@@ -32,6 +32,16 @@ class TestDetokenizer(unittest.TestCase):
         tokenized = nltk.wordpunct_tokenize(tagged_result)
         self.assertEqual(tokenized, self.tokens)
 
+    def test_various(self):
+        known_values = (
+            (['single-handedly', '``', 'creeping', 'socialism', "''"], "single-handedly ``creeping socialism''"),
+        )
+        detokenizer = regex.RegexDetokenizer()
+        for tokens, correct_response in known_values:
+            result = detokenizer.detokenize(tokens)
+            self.assertEqual(result, correct_response)
+            
+
 class TestToken(unittest.TestCase):
     def test_contraction(self):
         known_values = (

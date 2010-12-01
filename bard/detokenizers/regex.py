@@ -117,7 +117,7 @@ class RegexDetokenizer:
             elif next_token.islower() and len(next_token) == 1 and "'" in token:
                 # don't put space before a lone lowercase character.
                 output += ''
-            elif next_token.starts_container():
+            elif next_token.starts_container() or next_token.starts_quotation():
                 # put space before containers
                 output += ' '
             elif next_token.ispunct() or token.starts_quotation() or token.starts_container():
