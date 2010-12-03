@@ -10,7 +10,11 @@ def main():
     parser.add_argument('-l', '--length', help='number of tokens to generate', default=100, type=int)
     args = parser.parse_args()
 
-    corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
+    try:   
+        corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
+    except:
+        nltk.download('brown')
+        corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
     print bard.generate_text(corpus=corpus, length=args.length)
 
 if __name__ == "__main__":
