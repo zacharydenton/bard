@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+# Copyright 2010, Zach Denton <z@chdenton.com>
+# Licensed under the terms of the GPLv3 or later
+
 import random
 import sys
 import cPickle as pickle
@@ -30,9 +34,11 @@ class MarkovGenerator:
         self.tagged = self.istagged()
 
     def _generate_cache(self, trigrams, use_cache):
-        ''' generate a trigram index from a list of trigrams
+        """
+        generate a trigram index from a list of trigrams
         
-        where keys are (v1, v2) and value is list of possible v3's '''
+        where keys are (v1, v2) and value is list of possible v3's
+        """
         try:
             if use_cache:
                 #print >> sys.stderr, "loading trigram cache..."
@@ -161,7 +167,7 @@ class MarkovGenerator:
 
 class IntelligentMarkovGenerator(MarkovGenerator):
     def generate(self, w1=None, w2=None, length=100):
-        ''' 
+        """
         An enhanced version of the Markov chain text generator
 
         Keyword arguments:
@@ -183,7 +189,7 @@ class IntelligentMarkovGenerator(MarkovGenerator):
             >>> isinstance(text, str)
             True
 
-        '''
+        """
         #print >> sys.stderr, "generating pseudorandom text..."
         if w1 is None and w2 is None:
             w1, w2 = self.get_starter()

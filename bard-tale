@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+# Copyright 2010, Zach Denton <z@chdenton.com>
+# Licensed under the terms of the GPLv3 or later
+
 # use the bard module to tell a tale
 import argparse
 import nltk
@@ -8,14 +12,21 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--genre', choices=nltk.corpus.brown.categories(), default='science_fiction')
     parser.add_argument('-l', '--length', help='number of tokens to generate', default=100, type=int)
+    parser.add_argument('-t', '--type', help='type of generator to use', choices=['markov','sentence'], default=None)
     args = parser.parse_args()
 
-    try:   
-        corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
+    try:
+        if args.type == "sentence":
+            corpus = nltk.corpus.brown.tagged_sents(categories=args.genre)
+        else:
+            corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
     except:
         nltk.download('brown')
-        corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
-    print bard.generate_text(corpus=corpus, length=args.length)
+        if args.type == "sentence":
+            corpus = nltk.corpus.brown.tagged_sents(categories=args.genre)
+        else:
+            corpus = nltk.corpus.brown.tagged_words(categories=args.genre)
+    print bard.generate_text(corpus=corpus, length=args.length, generator_type=args.type)
 
 if __name__ == "__main__":
     main()
